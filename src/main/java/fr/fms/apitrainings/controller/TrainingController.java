@@ -1,17 +1,20 @@
 package fr.fms.apitrainings.controller;
 
-import fr.fms.apitrainings.entities.Category;
 import fr.fms.apitrainings.entities.Training;
 import fr.fms.apitrainings.errors.RecordNotFoundException;
 import fr.fms.apitrainings.service.ImplTrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -21,28 +24,33 @@ public class TrainingController {
     @Autowired
     private ImplTrainingService implTrainingService;
 
+    private final String path = "C:/Users/Stagiaires12P/IdeaProjects/api-trainings/src/main/resources/images/";
+
+    @Autowired
+    ServletContext context;
+
     @GetMapping("/trainings")
-    public List<Training> listOfTrainings(){
+    public List<Training> listOfTrainings() {
         return implTrainingService.getAll();
     }
 
     @PostMapping("/trainings")
-    public Training saveTraining(@RequestBody Training training){
+    public Training saveTraining(@RequestBody Training training) {
         return implTrainingService.save(training);
     }
 
     @PutMapping("/training/{id}")
-    public Training updateTraining(@RequestBody Training training){
-        return  implTrainingService.save(training);
+    public Training updateTraining(@RequestBody Training training) {
+        return implTrainingService.save(training);
     }
 
     @DeleteMapping("/trainings/{id}")
-    public void deleteTraining(@PathVariable("id") long id){
+    public void deleteTraining(@PathVariable("id") long id) {
         implTrainingService.delete(id);
     }
 
     @GetMapping("/training/{id}")
-    public Training getTrainingById(@PathVariable("id") long id){
+    public Training getTrainingById(@PathVariable("id") long id) {
         return implTrainingService.getOneById(id).orElseThrow(
                 () -> new RecordNotFoundException("Id de formation " + id + " n'existe pas."));
       /*  if(training.isPresent()){
@@ -52,7 +60,15 @@ public class TrainingController {
     }
 
     @GetMapping("/categorie/{id}/trainings")
-    public List<Training> getArticlesByCat(@PathVariable("id") long id){
+    public List<Training> getArticlesByCat(@PathVariable("id") long id) {
         return implTrainingService.getByCategory(id);
+    }
+
+    @GetMapping(path = "/trainingImage/{id}")
+    public byte[] getTrainingImage(@PathVariable("id") Long id) throws Exception {
+        Training training = implTrainingService.getOneById(id).get();
+        URL url = this.getClass().getResource("/images/" + training.getImage());
+        File file = new File(url.getPath());
+        return Files.readAllBytes(Paths.get(String.valueOf(file)));
     }
 }
