@@ -1,11 +1,19 @@
 package fr.fms.apitrainings.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.fms.apitrainings.entities.Training;
 import fr.fms.apitrainings.errors.RecordNotFoundException;
 import fr.fms.apitrainings.service.ImplCategoryService;
+import fr.fms.apitrainings.service.ImplImageService;
 import fr.fms.apitrainings.service.ImplTrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.net.URL;
@@ -26,19 +34,32 @@ public class TrainingController {
     @Autowired
     private ImplCategoryService implCategoryService;
 
+    @Autowired
+    private ImplImageService implImageService;
+
     @GetMapping("/trainings")
     public List<Training> listOfTrainings() {
         return implTrainingService.getAll();
     }
 
-    @GetMapping("/test")
-    public void test() {
-        Path path = Paths.get("uploads");
-        System.out.println(path);
-    }
     @PostMapping("/trainings")
-    public Training saveTraining(@RequestBody Training training){
-        return implTrainingService.save(training);
+    public void saveTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
+        Training training = new ObjectMapper().readValue(trainingJson, Training.class);
+        training.setCategory(implCategoryService.getOneById(training.getCategory().getId()).get());
+//        String extention = implImageService.getFileExtention(image.getOriginalFilename());
+//        String filename = training.getName() + "." + extention;
+        if (training.getImage() != null) {
+            training.setImage(image.getOriginalFilename());
+        } else {
+            training.setImage("noimage.png");
+        }
+        System.out.println(training);
+        try {
+            implImageService.save(image);
+        } catch (Exception e) {
+            System.out.println("Could not upload the file: " + image.getOriginalFilename() + "!");
+        }
+        implTrainingService.save(training);
     }
 
     @PutMapping("/training/{id}")
@@ -69,8 +90,6 @@ public class TrainingController {
     @GetMapping(path = "/trainingImage/{id}")
     public byte[] getTrainingImage(@PathVariable("id") Long id) throws Exception {
         Training training = implTrainingService.getOneById(id).get();
-        URL url = this.getClass().getResource("/images/" + training.getImage());
-        File file = new File(url.getPath());
-        return Files.readAllBytes(Paths.get(String.valueOf(file)));
+        return Files.readAllBytes(Paths.get("uploads").resolve(training.getImage()));
     }
 }

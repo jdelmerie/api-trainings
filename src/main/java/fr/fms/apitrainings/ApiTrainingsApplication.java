@@ -1,5 +1,7 @@
 package fr.fms.apitrainings;
 
+import fr.fms.apitrainings.service.ImplImageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,12 +16,16 @@ public class ApiTrainingsApplication implements CommandLineRunner {
     @Autowired
     private CategoryRepository categoryRepository;*/
 
+    @Autowired
+    private ImplImageService implImageService;
+
     public static void main(String[] args) {
         SpringApplication.run(ApiTrainingsApplication.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
+
    /* Category prog = categoryRepository.save(new Category(null, "Programmation"));
         Category framework = categoryRepository.save(new Category(null, "Framework"));
         Category cms = categoryRepository.save(new Category(null, "CMS"));
