@@ -22,4 +22,16 @@ public class Training implements Serializable {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Override
+    public String toString() {
+        return "Training{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", image='" + image + '\'' +
+                ", category=" + category +
+                '}';
+    }
 }

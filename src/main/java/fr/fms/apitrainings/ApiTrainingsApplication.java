@@ -1,17 +1,9 @@
 package fr.fms.apitrainings;
 
-import fr.fms.apitrainings.dao.CategoryRepository;
-import fr.fms.apitrainings.dao.OrdersRepository;
-import fr.fms.apitrainings.dao.TrainingRepository;
-import fr.fms.apitrainings.entities.Category;
-import fr.fms.apitrainings.entities.Orders;
-import fr.fms.apitrainings.entities.Training;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.Date;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
 public class ApiTrainingsApplication implements CommandLineRunner {

@@ -2,19 +2,18 @@ package fr.fms.apitrainings.controller;
 
 import fr.fms.apitrainings.entities.Training;
 import fr.fms.apitrainings.errors.RecordNotFoundException;
+import fr.fms.apitrainings.service.ImplCategoryService;
 import fr.fms.apitrainings.service.ImplTrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletContext;
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
 
 @CrossOrigin("*")
 @RestController
@@ -24,18 +23,21 @@ public class TrainingController {
     @Autowired
     private ImplTrainingService implTrainingService;
 
-    private final String path = "C:/Users/Stagiaires12P/IdeaProjects/api-trainings/src/main/resources/images/";
-
     @Autowired
-    ServletContext context;
+    private ImplCategoryService implCategoryService;
 
     @GetMapping("/trainings")
     public List<Training> listOfTrainings() {
         return implTrainingService.getAll();
     }
 
+    @GetMapping("/test")
+    public void test() {
+        Path path = Paths.get("uploads");
+        System.out.println(path);
+    }
     @PostMapping("/trainings")
-    public Training saveTraining(@RequestBody Training training) {
+    public Training saveTraining(@RequestBody Training training){
         return implTrainingService.save(training);
     }
 
