@@ -19,9 +19,17 @@ public class OrderItem implements Serializable {
     @ManyToOne
     private Training training;
 
-    @ManyToOne
-    private Orders order;
+    @ManyToOne(cascade = {CascadeType.ALL})
+    private Orders orders;
 
-    @OneToMany(mappedBy = "customer")
-    private Collection<Orders> orders;
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "id=" + id +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", training=" + training +
+                ", orders=" + orders +
+                '}';
+    }
 }

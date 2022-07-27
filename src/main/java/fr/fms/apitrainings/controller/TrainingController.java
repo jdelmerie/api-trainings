@@ -8,17 +8,12 @@ import fr.fms.apitrainings.service.ImplCategoryService;
 import fr.fms.apitrainings.service.ImplImageService;
 import fr.fms.apitrainings.service.ImplTrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -43,7 +38,7 @@ public class TrainingController {
     }
 
     @PostMapping("/trainings")
-    public void saveTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
+    public ResponseEntity<Error> saveTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
         Training training = new ObjectMapper().readValue(trainingJson, Training.class);
         training.setCategory(implCategoryService.getOneById(training.getCategory().getId()).get());
 //        String extention = implImageService.getFileExtention(image.getOriginalFilename());
@@ -53,18 +48,35 @@ public class TrainingController {
         } else {
             training.setImage("noimage.png");
         }
+        try {
+            implImageService.save(image);
+        } catch (Exception e) {
+            String message = "Could not upload the file: " + image.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new Error(message));
+        }
+        implTrainingService.save(training);
+        return null;
+    }
+
+    @PutMapping("/training/{id}")
+    public void updateTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
+        Training training = new ObjectMapper().readValue(trainingJson, Training.class);
+        training.setCategory(implCategoryService.getOneById(training.getCategory().getId()).get());
+////        String extention = implImageService.getFileExtention(image.getOriginalFilename());
+////        String filename = training.getName() + "." + extention;
+        if (training.getImage() != null && training.getImage() != image.getOriginalFilename()) {
+            training.setImage(image.getOriginalFilename());
+        } else {
+            training.setImage("noimage.png");
+        }
         System.out.println(training);
         try {
             implImageService.save(image);
         } catch (Exception e) {
-            System.out.println("Could not upload the file: " + image.getOriginalFilename() + "!");
+            String message = "Could not upload the file: " + image.getOriginalFilename() + "!";
+            System.out.println(message);
         }
         implTrainingService.save(training);
-    }
-
-    @PutMapping("/training/{id}")
-    public Training updateTraining(@RequestBody Training training) {
-        return implTrainingService.save(training);
     }
 
     @DeleteMapping("/trainings/{id}")

@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Entity @Data @AllArgsConstructor @NoArgsConstructor
 public class Orders implements Serializable {
@@ -19,8 +20,8 @@ public class Orders implements Serializable {
 
     private int number;
 
-    @OneToMany(mappedBy = "order")
-    private Collection<OrderItem> orderItems;
+    @OneToMany(mappedBy = "orders")
+    private List<OrderItem> orderItems;
 
     @ManyToOne(cascade = {CascadeType.ALL})
     private Customer customer;

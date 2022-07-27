@@ -36,21 +36,6 @@ public class ImplImageService implements ImageService {
         }
     }
 
-    @Override
-    public Resource load(String filename) {
-        try {
-            Path file = root.resolve(filename);
-            Resource resource = new UrlResource(file.toUri());
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
-                throw new RuntimeException("Could not read the file!");
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
-    }
-
     public String getFileExtention(String filename) {
         String ext = "";
         int index = filename.lastIndexOf('.');
