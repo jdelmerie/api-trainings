@@ -16,17 +16,17 @@ public class Role implements Serializable {
     private Long id;
     private String name;
 
-    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
-    private List<Users> users = new ArrayList<Users>();
+//    @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
+//    private List<Users> users = new ArrayList<Users>();
 
-    public Role(Long id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+//    public Role(Long id, String name) {
+//        this.id = id;
+//        this.name = name;
+//    }
 
     @Override
     public String toString() {
-        return "Role [roleId=" + id + ", name=" + name + ", users=" + users + "]";
+        return "Role [roleId=" + id + ", name=" + name + "]";
     }
 
 }

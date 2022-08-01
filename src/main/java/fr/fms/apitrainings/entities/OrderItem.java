@@ -1,5 +1,6 @@
 package fr.fms.apitrainings.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class OrderItem implements Serializable {
     @ManyToOne
     private Training training;
 
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne(cascade = {CascadeType.ALL}) @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Orders orders;
 
     @Override

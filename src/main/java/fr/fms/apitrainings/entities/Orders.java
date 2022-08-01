@@ -1,11 +1,13 @@
 package fr.fms.apitrainings.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -20,8 +22,8 @@ public class Orders implements Serializable {
 
     private int number;
 
-    @OneToMany(mappedBy = "orders")
-    private List<OrderItem> orderItems;
+    @OneToMany(mappedBy = "orders", fetch = FetchType.EAGER)
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @ManyToOne(cascade = {CascadeType.ALL})
     private Customer customer;

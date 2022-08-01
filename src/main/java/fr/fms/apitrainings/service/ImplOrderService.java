@@ -1,9 +1,7 @@
 package fr.fms.apitrainings.service;
 
-import fr.fms.apitrainings.dao.CustomerRepository;
 import fr.fms.apitrainings.dao.OrderItemRepository;
 import fr.fms.apitrainings.dao.OrdersRepository;
-import fr.fms.apitrainings.entities.Customer;
 import fr.fms.apitrainings.entities.OrderItem;
 import fr.fms.apitrainings.entities.Orders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +13,10 @@ import java.util.Optional;
 @Service
 public class ImplOrderService implements IService<Orders> {
 
-    @Autowired
-    OrdersRepository ordersRepository;
+    private int orderNumber = 20220;
 
     @Autowired
-    CustomerRepository customerRepository;
+    OrdersRepository ordersRepository;
 
     @Autowired
     OrderItemRepository orderItemRepository;
@@ -31,21 +28,23 @@ public class ImplOrderService implements IService<Orders> {
 
     @Override
     public Optional<Orders> getOneById(long id) {
-        return Optional.of(ordersRepository.getById(id));
+        return ordersRepository.findById(id);
     }
 
     @Override
     public Orders save(Orders obj) {
-        Customer customer = obj.getCustomer();
         List<OrderItem> orderItems = obj.getOrderItems();
-
+        obj.setNumber(getLastOrderNumber());
         ordersRepository.save(obj);
         long lastOrderId = getLastOrderId();
-
         for (OrderItem i : orderItems) {
             orderItemRepository.save(new OrderItem(null, i.getQuantity(), i.getPrice(), i.getTraining(), getOneById(lastOrderId).get()));
         }
         return getOneById(lastOrderId).get();
+    }
+
+    public List<OrderItem> getOrderItemsByOrderId(long id){
+        return orderItemRepository.findByOrdersId(id);
     }
 
     @Override
@@ -61,5 +60,15 @@ public class ImplOrderService implements IService<Orders> {
             lastInsertedId = lastOrder.getId();
         }
         return lastInsertedId;
+    }
+
+    public int getLastOrderNumber() {
+        List<Orders> orders = ordersRepository.findAll();
+        if (orders.size() != 0) {
+            Orders lastOrder = orders.get(orders.size() - 1);
+            orderNumber = lastOrder.getNumber();
+        }
+        System.out.println(orderNumber);
+        return orderNumber += 1;
     }
 }

@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity @Data @AllArgsConstructor @NoArgsConstructor
@@ -20,6 +17,9 @@ public class Customer implements Serializable {
     private String email;
     private String address;
     private String phone;
+
+    @ManyToOne
+    private Users users;
 
     @Override
     public String toString() {

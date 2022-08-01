@@ -10,6 +10,7 @@ import fr.fms.apitrainings.service.ImplTrainingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +39,7 @@ public class TrainingController {
     }
 
     @PostMapping("/trainings")
+    @PostAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Error> saveTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
         Training training = new ObjectMapper().readValue(trainingJson, Training.class);
         training.setCategory(implCategoryService.getOneById(training.getCategory().getId()).get());
@@ -59,6 +61,7 @@ public class TrainingController {
     }
 
     @PutMapping("/training/{id}")
+    @PostAuthorize("hasAuthority('ROLE_ADMIN')")
     public void updateTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
         Training training = new ObjectMapper().readValue(trainingJson, Training.class);
         training.setCategory(implCategoryService.getOneById(training.getCategory().getId()).get());
@@ -69,22 +72,22 @@ public class TrainingController {
         } else {
             training.setImage("noimage.png");
         }
-        System.out.println(training);
         try {
             implImageService.save(image);
         } catch (Exception e) {
             String message = "Could not upload the file: " + image.getOriginalFilename() + "!";
-            System.out.println(message);
         }
         implTrainingService.save(training);
     }
 
     @DeleteMapping("/trainings/{id}")
+    @PostAuthorize("hasAuthority('ROLE_ADMIN')")
     public void deleteTraining(@PathVariable("id") long id) {
         implTrainingService.delete(id);
     }
 
     @GetMapping("/training/{id}")
+    @PostAuthorize("hasAuthority('ROLE_ADMIN')")
     public Training getTrainingById(@PathVariable("id") long id) {
         return implTrainingService.getOneById(id).orElseThrow(
                 () -> new RecordNotFoundException("Id de formation " + id + " n'existe pas."));
