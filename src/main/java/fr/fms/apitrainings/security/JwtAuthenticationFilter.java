@@ -32,8 +32,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        System.out.println("User tente une connexion");
+        System.out.println("User " + username + " tente une connexion avec le mdp " + password);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
+        System.out.println(authenticationToken);
         return authenticationManager.authenticate(authenticationToken);
     }
 
@@ -44,19 +45,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Algorithm algorithm = Algorithm.HMAC256(JwtUtils.SECRET);
         String accessToken = JWT.create()
                 .withSubject(user.getUsername())
-//                .withExpiresAt(new Date(System.currentTimeMillis() + 1 * 60 * 1000))
+                .withExpiresAt(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .withClaim("roles", user.getAuthorities().stream().map(role -> role.getAuthority()).collect(Collectors.toList()))
                 .sign(algorithm);
-
-        String refreshToken = JWT.create()
-                .withSubject(user.getUsername())
-//                .withExpiresAt(new Date(System.currentTimeMillis() + 15 * 60 * 1000))
-                .withIssuer(request.getRequestURL().toString())
-                .sign(algorithm);
         Map<String, String> idToken = new HashMap<>();
         idToken.put("access-token", accessToken);
-        idToken.put("refresh-token", refreshToken);
         response.setContentType("application/json");
         new ObjectMapper().writeValue(response.getOutputStream(), idToken);
     }

@@ -37,4 +37,8 @@ public class ImplUserService implements IService<Users> {
     public Users getUser(String email) {
         return usersRepository.findByEmail(email);
     }
+
+    public Users findByEmail(String username) {
+        return usersRepository.findByEmail(username);
+    }
 }

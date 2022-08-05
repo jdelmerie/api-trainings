@@ -3,6 +3,7 @@ package fr.fms.apitrainings.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -37,14 +38,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.cors()
+                .and()
+                .csrf()
+                .disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/api/login").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/categories").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/category/{id}").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/order").hasAuthority("ROLE_USER")
+                .antMatchers(HttpMethod.GET, "/api/orders").hasAuthority("ROLE_ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/orderItems/{orderId}").hasAuthority("ROLE_ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/order/{orderId}").hasAuthority("ROLE_ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/trainings").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/trainings").hasAuthority("ROLE_ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/training/{id}").hasAuthority("ROLE_ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/trainings/{id}").hasAuthority("ROLE_ADMIN")
+                .antMatchers(HttpMethod.GET, "/api/training/{id}").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/categorie/{id}/trainings").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/trainingImage/{id}").permitAll()
+                .anyRequest().authenticated();
         http.addFilter(new JwtAuthenticationFilter(authenticationManagerBean()));
         http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
-//        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/test").hasAuthority("ROLE_ADMIN");
-//        http.authorizeRequests().anyRequest().authenticated();
-//        http.formLogin();
-//        http.authorizeRequests().anyRequest().permitAll();
     }
 
     @Bean
