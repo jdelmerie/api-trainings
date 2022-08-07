@@ -35,13 +35,4 @@ public class ImplImageService implements ImageService {
             throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
         }
     }
-
-    public String getFileExtention(String filename) {
-        String ext = "";
-        int index = filename.lastIndexOf('.');
-        if (index > 0) {
-            ext = filename.substring(index + 1);
-        }
-        return ext;
-    }
 }

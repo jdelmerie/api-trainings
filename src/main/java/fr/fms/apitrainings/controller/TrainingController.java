@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -38,42 +39,14 @@ public class TrainingController {
     }
 
     @PostMapping("/trainings")
-    public ResponseEntity<Error> saveTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
-        Training training = new ObjectMapper().readValue(trainingJson, Training.class);
+    public void saveTraining(@RequestBody Training training) {
         training.setCategory(implCategoryService.getOneById(training.getCategory().getId()).get());
-//        String extention = implImageService.getFileExtention(image.getOriginalFilename());
-//        String filename = training.getName() + "." + extention;
-        if (training.getImage() != null) {
-            training.setImage(image.getOriginalFilename());
-        } else {
-            training.setImage("noimage.png");
-        }
-        try {
-            implImageService.save(image);
-        } catch (Exception e) {
-            String message = "Could not upload the file: " + image.getOriginalFilename() + "!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new Error(message));
-        }
         implTrainingService.save(training);
-        return null;
     }
 
     @PutMapping("/training/{id}")
-    public void updateTraining(@RequestParam("image") MultipartFile image, @RequestParam("training") String trainingJson) throws JsonProcessingException {
-        Training training = new ObjectMapper().readValue(trainingJson, Training.class);
+    public void updateTraining(@PathVariable("id") long id, @RequestBody Training training) {
         training.setCategory(implCategoryService.getOneById(training.getCategory().getId()).get());
-////        String extention = implImageService.getFileExtention(image.getOriginalFilename());
-////        String filename = training.getName() + "." + extention;
-        if (training.getImage() != null && training.getImage() != image.getOriginalFilename()) {
-            training.setImage(image.getOriginalFilename());
-        } else {
-            training.setImage("noimage.png");
-        }
-        try {
-            implImageService.save(image);
-        } catch (Exception e) {
-            String message = "Could not upload the file: " + image.getOriginalFilename() + "!";
-        }
         implTrainingService.save(training);
     }
 
@@ -86,10 +59,6 @@ public class TrainingController {
     public Training getTrainingById(@PathVariable("id") long id) {
         return implTrainingService.getOneById(id).orElseThrow(
                 () -> new RecordNotFoundException("Id de formation " + id + " n'existe pas."));
-      /*  if(training.isPresent()){
-            return new ResponseEntity<>(training.get(), HttpStatus.OK);
-        }
-        return null;*/
     }
 
     @GetMapping("/categorie/{id}/trainings")
@@ -101,5 +70,19 @@ public class TrainingController {
     public byte[] getTrainingImage(@PathVariable("id") Long id) throws Exception {
         Training training = implTrainingService.getOneById(id).get();
         return Files.readAllBytes(Paths.get("uploads").resolve(training.getImage()));
+    }
+
+    @PostMapping("/uploadImage")
+    public ResponseEntity<Error> uploadImage(@RequestParam("image") MultipartFile image, @RequestParam("trainingId") long trainingId) {
+        try {
+            Training training = implTrainingService.getOneById(trainingId).get();
+            training.setImage(image.getOriginalFilename());
+            implImageService.save(image);
+            implTrainingService.save(training);
+        } catch (Exception e) {
+            String message = "Could not upload the file: " + image.getOriginalFilename() + "!";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new Error(message));
+        }
+        return null;
     }
 }

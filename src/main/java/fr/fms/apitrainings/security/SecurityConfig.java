@@ -60,6 +60,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/training/{id}").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/categorie/{id}/trainings").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/trainingImage/{id}").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/uploadImage").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated();
         http.addFilter(new JwtAuthenticationFilter(authenticationManagerBean()));
         http.addFilterBefore(new JwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);

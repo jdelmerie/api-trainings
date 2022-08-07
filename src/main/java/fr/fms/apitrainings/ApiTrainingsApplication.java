@@ -56,7 +56,7 @@ public class ApiTrainingsApplication implements CommandLineRunner {
         trainingRepository.save(new Training(null, "Java", "Formation Java SE 8 sur 5 jours", 1500, 1, "java.png", prog));
         trainingRepository.save(new Training(null, "DotNet", "Formation DotNet sur 3 jours", 1000, 1, "dotnet.png", prog));
         trainingRepository.save(new Training(null, "Python", "Formation Python/Django sur 5 jours", 1500, 1, "python.png", prog));
-        trainingRepository.save(new Training(null, "PHP Frameworks", "Symfony sur 15 jours", 2500, 1, "symfony.png", framework));
+        trainingRepository.save(new Training(null, "Symfony", "PHP Frameworks sur 15 jours", 2500, 1, "symfony.png", framework));
         trainingRepository.save(new Training(null, "Spring", "Spring Core/MVC/Security sur 20 jours", 5500, 1, "spring.png", framework));
         trainingRepository.save(new Training(null, "WordPress", "Découverte WP 8", 1800, 1, "wp.png", cms));
         trainingRepository.save(new Training(null, "Dupral", "Prise en main", 1000, 1, "noimage.png", cms));
